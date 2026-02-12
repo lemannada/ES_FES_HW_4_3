@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теория вероятностей и статистика | Jupyter Notebook</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .cell { border-left: 3px solid #e5e7eb; }
+        .cell:hover { border-left-color: #3b82f6; }
+        .cell-code { background: #f8f9fa; }
+        .code-editor {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            tab-size: 4;
+            resize: vertical;
+            min-height: 120px;
+        }
+        .output-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            min-height: 40px;
+            white-space: pre-wrap;
+        }
+        .output-error { color: #f87171; }
+        .formula-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+        }
+        .jupyter-header {
+            background: linear-gradient(90deg, #f37626 0%, #ff8c42 100%);
+        }
+        .run-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .task-card {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+        .task-card:hover {
+            border-color: #f97316;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <div class="jupyter-header text-white py-3 px-6 flex items-center justify-between sticky top-0 z-50 shadow-lg">
+        <div class="flex items-center gap-3">
+            <span class="font-semibold">ЭШ ФЭН. Домашнее задание 4.3</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="pyodideStatus" class="bg-white/20 px-4 py-1 rounded-full text-sm flex items-center gap-2">
+                <span class="loading-spinner"></span>
+                <span>Загрузка Python...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-5xl mx-auto py-8 px-4">
+
+        <!-- Введение -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Теория вероятностей и математическая статистика</h1>
+            <p class="text-gray-600 text-lg mb-4">
+                Всем привет! На связи Аня (@le_m_anna_d)!<br>
+                В этой домашке вам предстоит решить ряд задач по теории вероятностей и математической статистике,
+                <strong>программируя на Python</strong>. Я постаралась изложить весь материал максимально подробно,
+                чтобы каждый мог попробовать свои силы в решении прикладных задач, а потому при возникновении любых
+                вопросов можете мне писать!
+            </p>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r mb-4">
+                <p class="text-blue-800">
+                    <strong>Как работать:</strong><br>
+                    1. читайте теорию и изучайте примеры кода;<br>
+                    2. редактируйте код в ячейках и нажимайте <strong>▶ Запустить</strong>;<br>
+                    3. вводите ответы в специальные поля.
+                </p>
+            </div>
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r mb-4">
+                <p class="text-green-800">
+                    <strong>Подождите:</strong> Python нужно загрузиться прямо в вашем браузере.
+                    Когда появится зелёная надпись "Python готов" — можете начинать!
+                </p>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r mb-4">
+                <p class="text-red-800">
+                    <strong>Важно:</strong> в самом конце страницы есть небольшая шпаргалка. Она пригодится, если вы
+                    подзабыли материал с занятий.
+                </p>
+            </div>
+        </div>
+
+        <!-- Часть 0: Основы Python -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 0: основы Python</h2>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Переменные и вывод</h3>
+            <p class="text-gray-600 mb-4">
+                <strong>Переменная</strong> — это имя, которое хранит некоторое значение. Чтобы её вывести, можно
+                использовать функцию <code class="bg-gray-100 px-1 rounded">print()</code>.
+            </p>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-4 mono text-sm">
+                <code>
+<span class="text-purple-600">x</span> = 5           <span class="text-gray-500"># создаём переменную x со значением 5</span><br>
+<span class="text-purple-600">y</span> = 3           <span class="text-gray-500"># создаём переменную y со значением 3</span><br>
+<span class="text-blue-600">print</span>(x + y)    <span class="text-gray-500"># выведет 8</span><br>
+<span class="text-blue-600">print</span>(x * y)    <span class="text-gray-500"># выведет 15</span><br>
+<span class="text-blue-600">print</span>(x / y)    <span class="text-gray-500"># выведет 1.6666...</span><br>
+<span class="text-blue-600">print</span>(x ** 2)   <span class="text-gray-500"># возведение в степень - выведет 25</span>
+                </code>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Импорт библиотек</h3>
+            <p class="text-gray-600 mb-4">
+                <strong>Библиотека</strong> — это набор уже готовых функций, являющихся надстройкой над уже имеющимися
+                в Python. Конкретно мы с вами будем использовать библиотеки:
+            </p>
+            <ul class="list-disc list-inside text-gray-600 mb-4 space-y-2">
+                <li><code class="bg-gray-100 px-1 rounded">math</code> — для математических функций;</li>
+                <li><code class="bg-gray-100 px-1 rounded">numpy</code> — для работы с массивами чисел;</li>
+                <li><code class="bg-gray-100 px-1 rounded">scipy.stats</code> — для статистических распределений.</li>
+            </ul>
+
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm">
+                <code>
+<span class="text-blue-600">import</span> math                        <span class="text-gray-500"># импортируем всю библиотеку</span><br>
+<span class="text-blue-600">from</span> scipy <span class="text-blue-600">import</span> stats            <span class="text-gray-500"># импортируем модуль stats из scipy</span><br>
+<span class="text-blue-600">import</span> numpy <span class="text-blue-600">as</span> np                 <span class="text-gray-500"># импортируем numpy с коротким именем np</span>
+                </code>
+            </div>
+        </div>
+
+        <!-- Попробуйте сами -->
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Python</span>
+                    <span class="text-gray-500 text-sm">Теперь попробуйте сами — запустите этот код:</span>
+                </div>
+                <button onclick="runCode('demo1')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition flex items-center gap-2">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-demo1" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">import math
+import numpy as np
+from scipy import stats
+
+# Попробуйте изменить эти значения и запустить снова
+a = 10
+b = 3
+
+print("Сумма:", a + b)
+print("Факториал 5:", math.factorial(5))
+print("Корень из 16:", math.sqrt(16))
+print("Число π:", math.pi)</textarea>
+            <div id="output-demo1" class="output-area p-3 hidden"></div>
+        </div>
+
+        <!-- Часть 1: Комбинаторика и формулы -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 1: комбинаторика</h2>
+
+            <p class="text-gray-600 mb-4">
+                Для расчёта вероятностей нам понадобятся формулы из комбинаторики:
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="formula-box p-4 rounded-lg">
+                    <p class="text-amber-800 font-medium">Число сочетаний (C из n по k):</p>
+                    <p class="text-center text-lg mt-2 mono">C(n, k) = n! / (k! × (n-k)!)</p>
+                    <p class="text-amber-700 text-sm mt-2">Сколько способов выбрать k элементов из n (порядок не важен)</p>
+                </div>
+                <div class="formula-box p-4 rounded-lg">
+                    <p class="text-amber-800 font-medium">Число размещений:</p>
+                    <p class="text-center text-lg mt-2 mono">A(n, k) = n! / (n-k)!</p>
+                    <p class="text-amber-700 text-sm mt-2">Сколько способов выбрать k элементов из n (порядок важен)</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Функции в Python:</h3>
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm">
+                <code>
+<span class="text-blue-600">from</span> math <span class="text-blue-600">import</span> factorial, comb, perm<br><br>
+factorial(5)      <span class="text-gray-500"># 5! = 120</span><br>
+comb(10, 3)       <span class="text-gray-500"># C(10,3) = 120 — сочетания</span><br>
+perm(10, 3)       <span class="text-gray-500"># A(10,3) = 720 — размещения</span>
+                </code>
+            </div>
+        </div>
+
+        <!-- Пример комбинаторики -->
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Python</span>
+                    <span class="text-gray-500 text-sm">Пример: комбинаторика</span>
+                </div>
+                <button onclick="runCode('comb1')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition flex items-center gap-2">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-comb1" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from math import factorial, comb
+
+# В группе 20 студентов. Сколько способов выбрать старосту и заместителя?
+# Это размещение (порядок важен)
+n = 20
+способов = n * (n - 1)  # первого можно выбрать 20 способами, второго - 19
+print("Способов выбрать старосту и зама:", способов)
+
+# Пример: сколько способов выбрать 3 человека в комиссию из 10?
+# Это сочетание (порядок НЕ важен)
+C_10_3 = comb(10, 3)
+print("Способов выбрать комиссию:", C_10_3)
+
+# Проверим по формуле
+C_проверка = factorial(10) // (factorial(3) * factorial(7))
+print("Проверка по формуле:", C_проверка)</textarea>
+            <div id="output-comb1" class="output-area p-3 hidden"></div>
+        </div>
+
+        <!-- Часть 2: Дискретные распределения -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 2: дискретные распределения</h2>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Биномиальное распределение</h3>
+            <p class="text-gray-600 mb-4">
+                Описывает количество успехов в <strong>n независимых</strong> экспериментах с вероятностью успеха <strong>p</strong>.
+            </p>
+
+            <div class="formula-box p-4 rounded-lg mb-4">
+                <p class="text-amber-800 font-medium">Вероятность ровно k успехов:</p>
+                <p class="text-center text-lg mt-2 mono">P(X = k) = C(n,k) × p^k × (1-p)^(n-k)</p>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Функции scipy.stats для биномиального:</h3>
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm mb-4">
+                <code>
+<span class="text-blue-600">from</span> scipy.stats <span class="text-blue-600">import</span> binom<br><br>
+binom.pmf(k, n, p)   <span class="text-gray-500"># P(X = k) — вероятность ровно k успехов</span><br>
+binom.cdf(k, n, p)   <span class="text-gray-500"># P(X ≤ k) — вероятность не более k успехов</span><br>
+binom.sf(k, n, p)    <span class="text-gray-500"># P(X > k) — вероятность более k успехов</span><br>
+binom.mean(n, p)     <span class="text-gray-500"># математическое ожидание = n × p</span><br>
+binom.var(n, p)      <span class="text-gray-500"># дисперсия = n × p × (1-p)</span>
+                </code>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Распределение Пуассона</h3>
+            <p class="text-gray-600 mb-4">
+                Описывает количество событий за фиксированный промежуток времени, если события происходят
+                независимо со средней интенсивностью <strong>λ</strong> (лямбда).
+            </p>
+
+            <div class="formula-box p-4 rounded-lg mb-4">
+                <p class="text-amber-800 font-medium">Вероятность k событий:</p>
+                <p class="text-center text-lg mt-2 mono">P(X = k) = (λ^k × e^(-λ)) / k!</p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm">
+                <code>
+<span class="text-blue-600">from</span> scipy.stats <span class="text-blue-600">import</span> poisson<br><br>
+poisson.pmf(k, λ)    <span class="text-gray-500"># P(X = k)</span><br>
+poisson.cdf(k, λ)    <span class="text-gray-500"># P(X ≤ k)</span><br>
+poisson.sf(k, λ)     <span class="text-gray-500"># P(X > k)</span>
+                </code>
+            </div>
+        </div>
+
+        <!-- Пример биномиального -->
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Python</span>
+                    <span class="text-gray-500 text-sm">Пример: биномиальное и Пуассона</span>
+                </div>
+                <button onclick="runCode('binom1')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition flex items-center gap-2">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-binom1" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import binom, poisson
+
+# Биномиальное: бросаем монетку 10 раз, какова вероятность 7+ орлов?
+n, p = 10, 0.5
+prob_7_or_more = binom.sf(6, n, p)  # P(X > 6) = P(X ≥ 7)
+print(f"P(7 или больше орлов) = {prob_7_or_more:.4f}")
+
+# Пуассон: в среднем 3 клиента в час. Какова вероятность, что придёт 5 клиентов?
+lambda_rate = 3
+prob_5 = poisson.pmf(5, lambda_rate)
+print(f"P(ровно 5 клиентов) = {prob_5:.4f}")
+
+# Какова вероятность, что придёт не более 2 клиентов?
+prob_at_most_2 = poisson.cdf(2, lambda_rate)
+print(f"P(не более 2 клиентов) = {prob_at_most_2:.4f}")</textarea>
+            <div id="output-binom1" class="output-area p-3 hidden"></div>
+        </div>
+
+        <!-- ЗАДАНИЕ 1 -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm task-card" id="task1">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-orange-600">Задание 1 (3 балла)</h3>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">Биномиальное распределение</span>
+            </div>
+            <p class="text-gray-700 mb-4">
+                Завод производит детали, из которых <strong>8% бракованные</strong>.
+                Покупатель берёт партию из <strong>25 деталей</strong>.
+            </p>
+            <p class="text-gray-700 mb-4">
+                <strong>Найдите вероятность</strong>, что в партии окажется <strong>от 2 до 4 бракованных деталей включительно</strong>.
+            </p>
+        </div>
+
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-medium">Задание 1</span>
+                    <span class="text-gray-500 text-sm">Ваш код</span>
+                </div>
+                <button onclick="runCode('task1')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-task1" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import binom
+
+# Ваши данные
+n = 25       # количество деталей
+p = 0.08     # вероятность брака
+
+# Напишите код для вычисления P(2 ≤ X ≤ 4)
+# Ваш код здесь:
+
+probability = ...  # замените ... на ваш расчёт
+
+print(f"Вероятность от 2 до 4 бракованных: {probability:.4f}")</textarea>
+            <div id="output-task1" class="output-area p-3 hidden"></div>
+        </div>
+
+        <div class="cell bg-orange-50 rounded-lg p-4 mb-4 shadow-sm border border-orange-200">
+            <label class="block text-gray-700 font-medium mb-2">Ответ на задание 1 (округлите до 4 знаков после запятой):</label>
+            <input type="text" id="answer1" placeholder="Например: 0.1234"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono">
+        </div>
+
+        <!-- ЗАДАНИЕ 2 -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm task-card" id="task2">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-orange-600">Задание 2 (3 балла)</h3>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">Распределение Пуассона</span>
+            </div>
+            <p class="text-gray-700 mb-4">
+                На АЗС в среднем приезжает <strong>4 автомобиля в час</strong>.
+            </p>
+            <p class="text-gray-700 mb-4">
+                <strong>a)</strong> Какова вероятность, что за час приедет <strong>ровно 6 автомобилей</strong>?<br>
+                <strong>b)</strong> Какова вероятность, что за <strong>2 часа</strong> приедет <strong>более 10 автомобилей</strong>?
+            </p>
+        </div>
+
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-medium">Задание 2</span>
+                    <span class="text-gray-500 text-sm">Ваш код</span>
+                </div>
+                <button onclick="runCode('task2')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-task2" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import poisson
+
+# Данные
+lambda_per_hour = 4
+
+# a) Вероятность ровно 6 за 1 час
+prob_a = ...  # ваш код
+
+# b) Вероятность более 10 за 2 часа
+lambda_2hours = ...  # чему равно λ за 2 часа?
+prob_b = ...  # ваш код (используйте sf)
+
+print(f"a) P(X = 6) за 1 час = {prob_a:.4f}")
+print(f"b) P(X > 10) за 2 часа = {prob_b:.4f}")</textarea>
+            <div id="output-task2" class="output-area p-3 hidden"></div>
+        </div>
+
+        <div class="cell bg-orange-50 rounded-lg p-4 mb-4 shadow-sm border border-orange-200">
+            <label class="block text-gray-700 font-medium mb-2">Ответ a) (4 знака после запятой):</label>
+            <input type="text" id="answer2a" placeholder="Вероятность для пункта a"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono mb-3">
+            <label class="block text-gray-700 font-medium mb-2">Ответ b) (4 знака после запятой):</label>
+            <input type="text" id="answer2b" placeholder="Вероятность для пункта b"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono">
+        </div>
+
+        <!-- Часть 3: Непрерывные распределения -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 3: нормальное распределение</h2>
+
+            <p class="text-gray-600 mb-4">
+                <strong>Нормальное распределение N(μ, σ)</strong> — одно из важнейших в статистике!
+                Описывается средним <strong>μ</strong> и стандартным отклонением <strong>σ</strong>.
+            </p>
+
+            <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r mb-4">
+                <p class="text-purple-800">
+                    <strong>Правило трёх сигм:</strong><br>
+                    • ~68.27% данных в пределах μ ± 1σ<br>
+                    • ~95.45% данных в пределах μ ± 2σ<br>
+                    • ~99.73% данных в пределах μ ± 3σ
+                </p>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Функции scipy.stats для нормального:</h3>
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm mb-4">
+                <code>
+<span class="text-blue-600">from</span> scipy.stats <span class="text-blue-600">import</span> norm<br><br>
+norm.cdf(x, μ, σ)    <span class="text-gray-500"># P(X ≤ x) — функция распределения</span><br>
+norm.sf(x, μ, σ)     <span class="text-gray-500"># P(X > x) = 1 - cdf(x)</span><br>
+norm.ppf(q, μ, σ)    <span class="text-gray-500"># квантиль: какое x даёт P(X ≤ x) = q</span><br>
+norm.pdf(x, μ, σ)    <span class="text-gray-500"># плотность вероятности в точке x</span>
+                </code>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Стандартизация:</h3>
+            <div class="formula-box p-4 rounded-lg">
+                <p class="text-amber-800 font-medium">Z-оценка (стандартизованное значение):</p>
+                <p class="text-center text-lg mt-2 mono">Z = (X - μ) / σ</p>
+                <p class="text-amber-700 text-sm mt-2">Показывает, на сколько стандартных отклонений X отличается от среднего</p>
+            </div>
+        </div>
+
+        <!-- Пример нормального -->
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Python</span>
+                    <span class="text-gray-500 text-sm">Пример: нормальное распределение</span>
+                </div>
+                <button onclick="runCode('norm1')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-norm1" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import norm
+
+# Рост мужчин: μ = 175 см, σ = 7 см
+mu, sigma = 175, 7
+
+# Какой % мужчин ниже 165 см?
+prob_below_165 = norm.cdf(165, mu, sigma)
+print(f"P(рост < 165) = {prob_below_165:.4f} = {prob_below_165*100:.2f}%")
+
+# Какой % мужчин имеет рост от 170 до 185 см?
+prob_170_185 = norm.cdf(185, mu, sigma) - norm.cdf(170, mu, sigma)
+print(f"P(170 < рост < 185) = {prob_170_185:.4f} = {prob_170_185*100:.2f}%")
+
+# Какой рост у самых высоких 5% мужчин?
+top_5_percent = norm.ppf(0.95, mu, sigma)  # 95-й перцентиль
+print(f"Топ 5% мужчин выше {top_5_percent:.1f} см")</textarea>
+            <div id="output-norm1" class="output-area p-3 hidden"></div>
+        </div>
+
+        <!-- ЗАДАНИЕ 3 -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm task-card" id="task3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-orange-600">Задание 3 (3 балла)</h3>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">Нормальное распределение</span>
+            </div>
+            <p class="text-gray-700 mb-4">
+                Время выполнения теста студентами распределено нормально со средним <strong>μ = 45 минут</strong>
+                и стандартным отклонением <strong>σ = 10 минут</strong>.
+            </p>
+            <p class="text-gray-700 mb-4">
+                <strong>a)</strong> Какой процент студентов укладывается в отведённые <strong>60 минут</strong>?<br>
+                <strong>b)</strong> За какое время справляются самые быстрые <strong>10%</strong> студентов?
+            </p>
+        </div>
+
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-medium">Задание 3</span>
+                    <span class="text-gray-500 text-sm">Ваш код</span>
+                </div>
+                <button onclick="runCode('task3')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-task3" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import norm
+
+mu = 45    # среднее время
+sigma = 10 # стандартное отклонение
+
+# a) Процент студентов, укладывающихся в 60 минут
+percent_a = ...  # используйте cdf и умножьте на 100
+
+# b) За какое время справляются 10% самых быстрых?
+# Подсказка: если 10% самые быстрые, значит нужен 10-й перцентиль (ppf(0.10))
+time_b = ...
+
+print(f"a) В 60 минут укладывается {percent_a:.2f}% студентов")
+print(f"b) 10% самых быстрых справляются за {time_b:.2f} минут или меньше")</textarea>
+            <div id="output-task3" class="output-area p-3 hidden"></div>
+        </div>
+
+        <div class="cell bg-orange-50 rounded-lg p-4 mb-4 shadow-sm border border-orange-200">
+            <label class="block text-gray-700 font-medium mb-2">Ответ a) — процент (2 знака после запятой):</label>
+            <input type="text" id="answer3a" placeholder="Например: 84.13"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono mb-3">
+            <label class="block text-gray-700 font-medium mb-2">Ответ b) — минуты (2 знака после запятой):</label>
+            <input type="text" id="answer3b" placeholder="Например: 32.18"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono">
+        </div>
+
+        <!-- Часть 4: Мат ожидание и дисперсия -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 4: математическое ожидание и дисперсия</h2>
+
+            <p class="text-gray-600 mb-4">
+                Для массива данных мы можем вычислить описательные статистики:
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="formula-box p-4 rounded-lg">
+                    <p class="text-amber-800 font-medium">Среднее (mean):</p>
+                    <p class="text-center text-lg mt-2 mono">x̄ = Σxᵢ / n</p>
+                </div>
+                <div class="formula-box p-4 rounded-lg">
+                    <p class="text-amber-800 font-medium">Дисперсия (variance):</p>
+                    <p class="text-center text-lg mt-2 mono">s² = Σ(xᵢ - x̄)² / (n-1)</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Функции numpy:</h3>
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm">
+                <code>
+<span class="text-blue-600">import</span> numpy <span class="text-blue-600">as</span> np<br><br>
+data = [1, 2, 3, 4, 5]      <span class="text-gray-500"># или np.array([1, 2, 3, 4, 5])</span><br><br>
+np.mean(data)               <span class="text-gray-500"># среднее</span><br>
+np.var(data, ddof=1)        <span class="text-gray-500"># выборочная дисперсия (ddof=1 для n-1)</span><br>
+np.std(data, ddof=1)        <span class="text-gray-500"># стандартное отклонение</span><br>
+np.median(data)             <span class="text-gray-500"># медиана</span><br>
+np.percentile(data, 25)     <span class="text-gray-500"># 25-й перцентиль (Q1)</span>
+                </code>
+            </div>
+        </div>
+
+        <!-- ЗАДАНИЕ 4 -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm task-card" id="task4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-orange-600">Задание 4 (3 балла)</h3>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">Описательная статистика</span>
+            </div>
+            <p class="text-gray-700 mb-4">
+                Дан набор измерений температуры (°C) за 12 дней:
+            </p>
+            <p class="text-gray-700 mb-4 mono bg-gray-100 p-2 rounded">
+                [18.2, 19.5, 17.8, 22.1, 20.3, 19.8, 21.5, 18.9, 20.1, 19.2, 23.4, 17.5]
+            </p>
+            <p class="text-gray-700 mb-4">
+                Найдите: <strong>a)</strong> среднее, <strong>b)</strong> выборочное стандартное отклонение,
+                <strong>c)</strong> медиану.
+            </p>
+        </div>
+
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-medium">Задание 4</span>
+                    <span class="text-gray-500 text-sm">Ваш код</span>
+                </div>
+                <button onclick="runCode('task4')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-task4" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">import numpy as np
+
+temperatures = [18.2, 19.5, 17.8, 22.1, 20.3, 19.8, 21.5, 18.9, 20.1, 19.2, 23.4, 17.5]
+
+# a) Среднее
+mean_temp = ...
+
+# b) Выборочное стандартное отклонение (используйте ddof=1)
+std_temp = ...
+
+# c) Медиана
+median_temp = ...
+
+print(f"a) Среднее: {mean_temp:.2f} °C")
+print(f"b) Стандартное отклонение: {std_temp:.2f} °C")
+print(f"c) Медиана: {median_temp:.2f} °C")</textarea>
+            <div id="output-task4" class="output-area p-3 hidden"></div>
+        </div>
+
+        <div class="cell bg-orange-50 rounded-lg p-4 mb-4 shadow-sm border border-orange-200">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Ответ a) — среднее:</label>
+                    <input type="text" id="answer4a" placeholder="XX.XX"
+                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-full focus:border-orange-500 focus:outline-none mono">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Ответ b) — std:</label>
+                    <input type="text" id="answer4b" placeholder="X.XX"
+                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-full focus:border-orange-500 focus:outline-none mono">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Ответ c) — медиана:</label>
+                    <input type="text" id="answer4c" placeholder="XX.XX"
+                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-full focus:border-orange-500 focus:outline-none mono">
+                </div>
+            </div>
+        </div>
+
+        <!-- Часть 5: Проверка гипотез -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 5: проверка гипотез и p-value</h2>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Что такое гипотеза?</h3>
+            <ul class="list-disc list-inside text-gray-600 mb-4 space-y-2">
+                <li><strong>H₀ (нулевая)</strong> — "ничего не изменилось", "эффекта нет"</li>
+                <li><strong>H₁ (альтернативная)</strong> — "есть изменение", "эффект есть"</li>
+            </ul>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r mb-4">
+                <p class="text-green-800">
+                    <strong>p-value</strong> — вероятность получить такие (или более экстремальные) данные,
+                    если нулевая гипотеза верна.
+                </p>
+            </div>
+
+            <div class="formula-box p-4 rounded-lg mb-4">
+                <p class="text-amber-800 font-medium">Правило:</p>
+                <ul class="list-disc list-inside text-amber-800 mt-2">
+                    <li><strong>p-value < α</strong> (обычно α = 0.05) → <strong>отвергаем H₀</strong></li>
+                    <li><strong>p-value ≥ α</strong> → <strong>не можем отвергнуть H₀</strong></li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">t-тест для одной выборки:</h3>
+            <p class="text-gray-600 mb-4">
+                Проверяет, отличается ли среднее выборки от заданного значения.
+            </p>
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm mb-4">
+                <code>
+<span class="text-blue-600">from</span> scipy.stats <span class="text-blue-600">import</span> ttest_1samp<br><br>
+<span class="text-gray-500"># data — массив измерений</span><br>
+<span class="text-gray-500"># mu_0 — значение, с которым сравниваем (гипотеза H₀: μ = mu_0)</span><br>
+statistic, p_value = ttest_1samp(data, mu_0)<br><br>
+<span class="text-gray-500"># statistic — t-статистика</span><br>
+<span class="text-gray-500"># p_value — p-значение (двусторонний тест)</span>
+                </code>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">t-тест для двух независимых выборок:</h3>
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm">
+                <code>
+<span class="text-blue-600">from</span> scipy.stats <span class="text-blue-600">import</span> ttest_ind<br><br>
+<span class="text-gray-500"># Сравниваем средние двух групп</span><br>
+statistic, p_value = ttest_ind(group1, group2)
+                </code>
+            </div>
+        </div>
+
+        <!-- Пример t-теста -->
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Python</span>
+                    <span class="text-gray-500 text-sm">Пример: t-тест</span>
+                </div>
+                <button onclick="runCode('ttest1')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-ttest1" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import ttest_1samp
+import numpy as np
+
+# Производитель заявляет, что средний вес упаковки = 500 г
+# Мы измерили 15 упаковок:
+weights = [498, 502, 495, 501, 499, 503, 497, 500, 496, 502, 498, 501, 499, 497, 500]
+
+# H₀: μ = 500 (средний вес равен заявленному)
+# H₁: μ ≠ 500 (средний вес отличается)
+
+t_stat, p_value = ttest_1samp(weights, 500)
+
+print(f"Среднее выборки: {np.mean(weights):.2f} г")
+print(f"t-статистика: {t_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+print()
+if p_value < 0.05:
+    print("Вывод: p < 0.05, отвергаем H₀. Вес отличается от заявленного.")
+else:
+    print("Вывод: p >= 0.05, не можем отвергнуть H₀. Нет доказательств отличия.")</textarea>
+            <div id="output-ttest1" class="output-area p-3 hidden"></div>
+        </div>
+
+        <!-- ЗАДАНИЕ 5 -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm task-card" id="task5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-orange-600">Задание 5 (4 балла)</h3>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">t-тест</span>
+            </div>
+            <p class="text-gray-700 mb-4">
+                Исследователь проверяет, влияет ли новая методика обучения на результаты тестирования.
+                <strong>Контрольная группа</strong> (обычное обучение):
+            </p>
+            <p class="text-gray-700 mb-2 mono bg-gray-100 p-2 rounded text-sm">
+                [72, 68, 75, 71, 69, 74, 70, 73, 67, 72, 71, 68]
+            </p>
+            <p class="text-gray-700 mb-4">
+                <strong>Экспериментальная группа</strong> (новая методика):
+            </p>
+            <p class="text-gray-700 mb-4 mono bg-gray-100 p-2 rounded text-sm">
+                [78, 82, 76, 80, 79, 85, 77, 81, 83, 79, 80, 84]
+            </p>
+            <p class="text-gray-700 mb-4">
+                <strong>a)</strong> Проведите t-тест для двух независимых выборок.<br>
+                <strong>b)</strong> Укажите p-value и сделайте вывод при уровне значимости α = 0.05.
+            </p>
+        </div>
+
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-medium">Задание 5</span>
+                    <span class="text-gray-500 text-sm">Ваш код</span>
+                </div>
+                <button onclick="runCode('task5')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-task5" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import ttest_ind
+import numpy as np
+
+control = [72, 68, 75, 71, 69, 74, 70, 73, 67, 72, 71, 68]
+experimental = [78, 82, 76, 80, 79, 85, 77, 81, 83, 79, 80, 84]
+
+# Вычислите средние обеих групп
+mean_control = ...
+mean_experimental = ...
+
+# Проведите t-тест для двух независимых выборок
+t_stat, p_value = ...
+
+print(f"Среднее контрольной группы: {mean_control:.2f}")
+print(f"Среднее экспериментальной группы: {mean_experimental:.2f}")
+print(f"t-статистика: {t_stat:.4f}")
+print(f"p-value: {p_value:.6f}")</textarea>
+            <div id="output-task5" class="output-area p-3 hidden"></div>
+        </div>
+
+        <div class="cell bg-orange-50 rounded-lg p-4 mb-4 shadow-sm border border-orange-200">
+            <label class="block text-gray-700 font-medium mb-2">Ответ: p-value (6 знаков после запятой):</label>
+            <input type="text" id="answer5a" placeholder="0.XXXXXX"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono mb-3">
+            <label class="block text-gray-700 font-medium mb-2">Вывод (напишите "отвергаем H0" или "не отвергаем H0"):</label>
+            <input type="text" id="answer5b" placeholder="Ваш вывод"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Часть 6: Доверительные интервалы -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Часть 6: доверительные интервалы</h2>
+
+            <p class="text-gray-600 mb-4">
+                <strong>Доверительный интервал</strong> — это диапазон, который с заданной вероятностью (обычно 95%)
+                содержит истинное значение параметра.
+            </p>
+
+            <div class="formula-box p-4 rounded-lg mb-4">
+                <p class="text-amber-800 font-medium">Доверительный интервал для среднего:</p>
+                <p class="text-center text-lg mt-2 mono">CI = x̄ ± t_(α/2) × (s / √n)</p>
+                <p class="text-amber-700 text-sm mt-2">где t_(α/2) — критическое значение t-распределения, s — выборочное std, n — размер выборки</p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mono text-sm">
+                <code>
+<span class="text-blue-600">from</span> scipy.stats <span class="text-blue-600">import</span> t<br>
+<span class="text-blue-600">import</span> numpy <span class="text-blue-600">as</span> np<br><br>
+data = [...]<br>
+n = len(data)<br>
+mean = np.mean(data)<br>
+std = np.std(data, ddof=1)<br>
+se = std / np.sqrt(n)                    <span class="text-gray-500"># стандартная ошибка</span><br><br>
+confidence = 0.95<br>
+alpha = 1 - confidence<br>
+t_critical = t.ppf(1 - alpha/2, df=n-1)  <span class="text-gray-500"># критическое значение t</span><br><br>
+lower = mean - t_critical * se<br>
+upper = mean + t_critical * se
+                </code>
+            </div>
+        </div>
+
+        <!-- ЗАДАНИЕ 6 -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm task-card" id="task6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-orange-600">Задание 6 (4 балла)</h3>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">Доверительный интервал</span>
+            </div>
+            <p class="text-gray-700 mb-4">
+                Измерено время отклика сервера (в мс) для 10 запросов:
+            </p>
+            <p class="text-gray-700 mb-4 mono bg-gray-100 p-2 rounded">
+                [45, 52, 48, 51, 47, 53, 49, 50, 46, 52]
+            </p>
+            <p class="text-gray-700 mb-4">
+                Постройте <strong>95% доверительный интервал</strong> для среднего времени отклика.
+            </p>
+        </div>
+
+        <div class="cell cell-code rounded-lg mb-4 shadow-sm overflow-hidden">
+            <div class="bg-gray-200 px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-medium">Задание 6</span>
+                    <span class="text-gray-500 text-sm">Ваш код</span>
+                </div>
+                <button onclick="runCode('task6')" class="run-btn bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium transition">
+                    ▶ Запустить
+                </button>
+            </div>
+            <textarea id="code-task6" class="code-editor w-full p-4 border-0 focus:outline-none focus:ring-0" spellcheck="false">from scipy.stats import t
+import numpy as np
+
+data = [45, 52, 48, 51, 47, 53, 49, 50, 46, 52]
+
+n = len(data)
+mean = np.mean(data)
+std = np.std(data, ddof=1)
+se = std / np.sqrt(n)  # стандартная ошибка
+
+# Для 95% доверительного интервала
+confidence = 0.95
+alpha = 1 - confidence
+t_critical = t.ppf(1 - alpha/2, df=n-1)
+
+# Вычислите границы интервала
+lower = ...
+upper = ...
+
+print(f"Среднее: {mean:.2f} мс")
+print(f"Стандартная ошибка: {se:.4f}")
+print(f"t-критическое (df={n-1}): {t_critical:.4f}")
+print(f"95% доверительный интервал: [{lower:.2f}, {upper:.2f}] мс")</textarea>
+            <div id="output-task6" class="output-area p-3 hidden"></div>
+        </div>
+
+        <div class="cell bg-orange-50 rounded-lg p-4 mb-4 shadow-sm border border-orange-200">
+            <label class="block text-gray-700 font-medium mb-2">Нижняя граница интервала (2 знака):</label>
+            <input type="text" id="answer6a" placeholder="XX.XX"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono mb-3">
+            <label class="block text-gray-700 font-medium mb-2">Верхняя граница интервала (2 знака):</label>
+            <input type="text" id="answer6b" placeholder="XX.XX"
+                class="border-2 border-gray-300 rounded-lg px-4 py-2 w-64 focus:border-orange-500 focus:outline-none mono">
+        </div>
+
+        <!-- Сохранение ответов -->
+        <div class="cell bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 mb-4 shadow-lg text-white">
+            <h2 class="text-2xl font-bold mb-4">Сохранение ответов</h2>
+            <p class="mb-4 opacity-90">
+                Нажмите кнопку ниже, чтобы сохранить все ваши ответы в файл.
+                Сдайте этот файл в обычную форму.
+            </p>
+            <button onclick="saveAnswers()" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition">
+                Сохранить ответы
+            </button>
+        </div>
+
+        <!-- Шпаргалка -->
+        <div class="cell bg-white rounded-lg p-6 mb-4 shadow-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Шпаргалка</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-blue-800 mb-2">scipy.stats.binom</h4>
+                    <p class="mono text-xs">pmf(k, n, p) — P(X = k)<br>cdf(k, n, p) — P(X ≤ k)<br>sf(k, n, p) — P(X > k)</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-green-800 mb-2">scipy.stats.poisson</h4>
+                    <p class="mono text-xs">pmf(k, λ) — P(X = k)<br>cdf(k, λ) — P(X ≤ k)<br>sf(k, λ) — P(X > k)</p>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-yellow-800 mb-2">scipy.stats.norm</h4>
+                    <p class="mono text-xs">cdf(x, μ, σ) — P(X ≤ x)<br>ppf(q, μ, σ) — квантиль<br>sf(x, μ, σ) — P(X > x)</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-purple-800 mb-2">numpy</h4>
+                    <p class="mono text-xs">mean(data), std(data, ddof=1)<br>var(data, ddof=1), median(data)</p>
+                </div>
+                <div class="bg-pink-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-pink-800 mb-2">scipy.stats (тесты)</h4>
+                    <p class="mono text-xs">ttest_1samp(data, μ₀)<br>ttest_ind(group1, group2)</p>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-red-800 mb-2">math</h4>
+                    <p class="mono text-xs">factorial(n), comb(n, k)<br>sqrt(x), pi, e</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let pyodide = null;
+        let pyodideReady = false;
+
+        async function initPyodide() {
+            try {
+                pyodide = await loadPyodide();
+                await pyodide.loadPackage(['numpy', 'scipy']);
+                pyodideReady = true;
+
+                document.getElementById('pyodideStatus').innerHTML = `
+                    <span class="text-green-300">✓</span>
+                    <span>Python готов</span>
+                `;
+                document.getElementById('pyodideStatus').classList.add('bg-green-500/30');
+
+                // Enable all run buttons
+                document.querySelectorAll('.run-btn').forEach(btn => {
+                    btn.disabled = false;
+                });
+            } catch (error) {
+                document.getElementById('pyodideStatus').innerHTML = `
+                    <span class="text-red-300">✗</span>
+                    <span>Ошибка загрузки</span>
+                `;
+                console.error('Pyodide init error:', error);
+            }
+        }
+
+        async function runCode(cellId) {
+            if (!pyodideReady) {
+                alert('Python ещё загружается. Подождите, пока не появится зелёная надпись "Python готов".');
+                return;
+            }
+
+            const codeArea = document.getElementById('code-' + cellId);
+            const outputArea = document.getElementById('output-' + cellId);
+            const code = codeArea.value;
+
+            outputArea.classList.remove('hidden');
+            outputArea.innerHTML = '<span class="text-gray-500">Выполняется...</span>';
+
+            try {
+                // Redirect stdout
+                pyodide.runPython(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+`);
+
+                // Run user code
+                await pyodide.runPythonAsync(code);
+
+                // Get output
+                const output = pyodide.runPython('sys.stdout.getvalue()');
+
+                if (output.trim()) {
+                    outputArea.innerHTML = '<span class="text-gray-500">Out:</span>\n' + output;
+                    outputArea.classList.remove('output-error');
+                } else {
+                    outputArea.innerHTML = '<span class="text-gray-500">Код выполнен (нет вывода)</span>';
+                }
+            } catch (error) {
+                outputArea.innerHTML = '<span class="output-error">Ошибка:\n' + error.message + '</span>';
+                outputArea.classList.add('output-error');
+            }
+        }
+
+        function saveAnswers() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let yPos = 20;
+            const leftMargin = 20;
+
+            doc.setFontSize(18);
+            doc.setTextColor(243, 118, 38);
+            doc.text("Probability & Statistics - Answers", leftMargin, yPos);
+            yPos += 10;
+
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text("Date: " + new Date().toLocaleString(), leftMargin, yPos);
+            yPos += 15;
+
+            doc.setDrawColor(200, 200, 200);
+            doc.line(leftMargin, yPos - 5, 190, yPos - 5);
+
+            function addTask(num, title, answers) {
+                if (yPos > 250) { doc.addPage(); yPos = 20; }
+                doc.setFontSize(12);
+                doc.setTextColor(234, 88, 12);
+                doc.setFont("helvetica", "bold");
+                doc.text("Task " + num + ": " + title, leftMargin, yPos);
+                yPos += 8;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(11);
+                doc.setTextColor(60, 60, 60);
+                answers.forEach(ans => {
+                    doc.text(ans.label + ": " + (ans.value || "(empty)"), leftMargin + 5, yPos);
+                    yPos += 7;
+                });
+                yPos += 5;
+            }
+
+            addTask(1, "Binomial Distribution", [
+                { label: "P(2 <= X <= 4)", value: document.getElementById('answer1').value }
+            ]);
+
+            addTask(2, "Poisson Distribution", [
+                { label: "a) P(X = 6)", value: document.getElementById('answer2a').value },
+                { label: "b) P(X > 10)", value: document.getElementById('answer2b').value }
+            ]);
+
+            addTask(3, "Normal Distribution", [
+                { label: "a) Percent", value: document.getElementById('answer3a').value },
+                { label: "b) Time (min)", value: document.getElementById('answer3b').value }
+            ]);
+
+            addTask(4, "Descriptive Statistics", [
+                { label: "a) Mean", value: document.getElementById('answer4a').value },
+                { label: "b) Std", value: document.getElementById('answer4b').value },
+                { label: "c) Median", value: document.getElementById('answer4c').value }
+            ]);
+
+            addTask(5, "T-test", [
+                { label: "p-value", value: document.getElementById('answer5a').value },
+                { label: "Conclusion", value: document.getElementById('answer5b').value }
+            ]);
+
+            addTask(6, "Confidence Interval", [
+                { label: "Lower bound", value: document.getElementById('answer6a').value },
+                { label: "Upper bound", value: document.getElementById('answer6b').value }
+            ]);
+
+            doc.save('probability_stats_answers.pdf');
+            alert('PDF сохраняется!');
+        }
+
+        // Initialize Pyodide when page loads
+        initPyodide();
+    </script>
+</body>
+</html>
